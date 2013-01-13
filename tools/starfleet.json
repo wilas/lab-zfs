@@ -1,0 +1,24 @@
+{
+    "galaxy01": { "disc":"/var/tmp/disc01.file",
+                  "fs": [
+                    {"name":"galaxy01/fleet11" },
+                    {"name":"galaxy01/fleet12" },
+                    {"name":"galaxy01/fleet13" }
+                    ]
+
+    },
+    "galaxy02": { "disc": "/var/tmp/disc02.file",
+                  "fs": [
+                    {"name":"galaxy02/fleet21" },
+                    {"name":"galaxy02/fleet22" },
+                    {"name":"galaxy02/fleet23" }
+                    ]
+    },
+    "galaxy03": { "disc": "/var/tmp/disc03.file",
+                  "fs": [
+                    {"name":"galaxy03/fleet31" },
+                    {"name":"galaxy03/fleet32" },
+                    {"name":"galaxy03/fleet33" }
+                    ]
+    }
+}

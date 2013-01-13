@@ -1,0 +1,147 @@
+stage { "base": before => Stage["main"] }
+stage { "last": require => Stage["main"] }
+
+# basic config
+class { "install_repos": stage => "base" }
+class { "basic_package": stage => "base" }
+class { "user::root": stage    => "base"}
+
+# /etc/hosts
+host { "$fqdn":
+    ip           => "$ipaddress_eth1",
+    host_aliases => "$hostname",
+}
+
+# firewall manage
+service { "iptables":
+    ensure => running,
+    enable => true,
+}
+exec { 'clear-firewall':
+    command     => '/sbin/iptables -F',
+    refreshonly => true,
+}
+exec { 'persist-firewall':
+    command     => '/sbin/iptables-save >/etc/sysconfig/iptables',
+    refreshonly => true,
+}
+Firewall {
+    subscribe => Exec['clear-firewall'],
+    notify    => Exec['persist-firewall'],
+}
+class { "basic_firewall": }
+
+#ZFS
+#exec { 'yum groupinstall "Development Tools"':
+    #path => '/bin:/sbin:/usr/bin:/usr/sbin',
+    #test if installed
+    #unless => 
+#}
+
+# why not fuse: http://lists.debian.org/debian-user/2012/05/msg01026.html
+
+#http://prefetch.net/blog/index.php/2012/02/13/installing-zfs-on-a-centos-6-linux-server/
+package { [ 'zlib-devel', 
+            'libuuid-devel',
+            'parted',
+            'lsscsi']:
+    ensure => installed,
+}
+
+#            'libblkid-devel', 
+#            'libselinux-devel', 
+#            #'e2fsprogs-devel', 
+
+#gcc?
+#make?
+#wget
+#kernel-devel
+#parted
+
+package { 'rpm-build':
+    ensure => installed,
+}
+
+#package { 'dkms':
+#    ensure => installed,
+#}
+
+
+#$baseurl = "https://github.com/zfsonlinux/zfsonlinux.github.com/tree/master/downloads/0.6.0-rc13/"
+$baseurl = "http://github.com/downloads/zfsonlinux"
+#that version support dkms - modules will then be automatically rebuilt when your kernel is updated
+$version = "0.6.0-rc12" 
+
+
+exec { "get spl": #keep in files
+    command => "wget -O /opt/spl-$version.tar.gz $baseurl/spl/spl-$version.tar.gz",
+    path    => "/bin:/sbin:/usr/bin:/usr/sbin",
+    creates => "/opt/spl-$version.tar.gz",
+}
+exec { "unzip spl":
+    command => "tar -xvzf /opt/spl-$version.tar.gz -C /opt",
+    path    => "/bin:/sbin:/usr/bin:/usr/sbin",
+    creates => "/opt/spl-$version",
+    require => Exec['get spl'],
+}
+#exec { "build spl":
+#    command  => "./configure && make rpm",
+#    path     => "/bin:/sbin:/usr/bin:/usr/sbin",
+#    cwd      => "/opt/spl-$version",
+#    provider => "shell",
+#    creates  => "/opt/spl-$version/spl-$version.x86_64.rpm",
+#    require  => Exec['unzip spl'],
+#}
+exec { "install spl":
+    command  => "./configure && make rpm && yum install -y *.x86_64.rpm",
+    path     => "/bin:/sbin:/usr/bin:/usr/sbin",
+    cwd      => "/opt/spl-$version",
+    provider => "shell",
+    timeout  => 0,
+    #creates  => "/opt/spl-$version/spl-$version.x86_64.rpm", #should be unless installed using yum
+    unless   => "yum list installed 'spl'",
+    require  => Exec['unzip spl'],
+#    require  => Exec['build spl'],
+}
+exec { "get zfs":
+    command => "wget -O /opt/zfs-$version.tar.gz $baseurl/zfs/zfs-$version.tar.gz",
+    path    => "/bin:/sbin:/usr/bin:/usr/sbin",
+    creates => "/opt/zfs-$version.tar.gz",
+    require => Exec['install spl'],
+}
+exec { "unzip zfs":
+    command => "tar -xvzf /opt/zfs-$version.tar.gz -C /opt",
+    path    => "/bin:/sbin:/usr/bin:/usr/sbin",
+    creates => "/opt/zfs-$version",
+    require => Exec['get zfs'],
+}
+#exec { "build zfs":
+#    command  => "./configure && make rpm",
+#    path     => "/bin:/sbin:/usr/bin:/usr/sbin",
+#    cwd      => "/opt/spl-$version",
+#    provider => "shell",
+#    creates  => "/opt/zfs-$version/zfs-$version.x86_64.rpm",
+#    require  => Exec['unzip zfs'],
+#}
+exec { "install zfs":
+    command  => "./configure && make rpm && yum install -y *.x86_64.rpm",
+    path     => "/bin:/sbin:/usr/bin:/usr/sbin",
+    cwd      => "/opt/zfs-$version",
+    provider => "shell",
+    timeout  => 0,
+    #creates  => "/opt/zfs-$version/zfs-$version.x86_64.rpm", #should be unless installed using yum
+    unless   => "yum list installed 'zfs'",
+    require  => Exec['unzip zfs'],
+#    require  => Exec['build zfs'],
+}
+
+# dd if=/dev/zero of=disck01.file  bs=1024  count=65536
+# zpool create sea01 /root/disck01.file
+# zpool create sea02 /root/disck02.file
+# zpool list
+# zfs create sea01/tuna01
+# zfs create sea01/tuna02
+# zfs snapshot sea01/tuna01@red
+# zfs snapshot sea01/tuna01@green
+# zfs snapshot sea01/tuna01@blue
+# zfs list -t snapshot,filesystem,volume
