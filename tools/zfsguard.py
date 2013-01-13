@@ -66,9 +66,7 @@ def backup_guard(fs, class_nr):
             next_control_nr = (prev + 1) % modulov
 
     for ptr in range(0, class_nr):
-        # last must by replaced anyway, co jak zmniejsze ilosc tasm ? i zostana stare backupy z tagami wyzszymi nie do usuniecia ?
-        # to wszystko sie zawiesi..... jak hanoi sie ulozy....
-        # ostatnia klase bede obrzadzal, mam snapshota to zobaczenia, znapszot jest poprawnej klasy 
+        # last must be replaced anyway; do we have enough snapshots; snapshot has proper class
         if (len(class_list)-1>ptr) and (len(srt_snapshots) > ptr) and (srt_snapshots[ptr][backup_property] == class_list[ptr]):
             continue
         else:
