@@ -14,7 +14,7 @@
                     {"name":"galaxy02/fleet23" }
                     ]
     },
-    "galaxy03": { "vdev": ["raidz2", "/var/tmp/disc30.file", "/var/tmp/disc31.file", "/var/tmp/disc32.file"],
+    "galaxy03": { "vdev": ["raidz2", "/var/tmp/disc30.file", "/var/tmp/disc31.file", "/var/tmp/disc32.file", "/var/tmp/disc33.file"],
                   "fs": [
                     {"name":"galaxy03/fleet31" },
                     {"name":"galaxy03/fleet32" },
