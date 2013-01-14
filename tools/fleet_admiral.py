@@ -17,6 +17,7 @@
 #
 
 import string
+import re
 import json
 
 import discobolus
@@ -31,12 +32,17 @@ def _load_zfs_scheme(filename):
 
 def _create_filesystem(zfs_scheme):
     for zpool  in zfs_scheme:
-        # create disc to play
-        disc = zfs_scheme[zpool]['disc']
-        discobolus.create_disc(disc)
+        # extract discs from vdev description
+        reserved = ['mirror', 'raidz[0-9]*', 'spare', 'log', 'cache']
+        regex = re.compile(r'|'.join(reserved))
+        vdev = zfs_scheme[zpool]['vdev']
+        discs = filter(lambda x: not regex.search(x), vdev)
+        # create discs to play
+        for disc in discs:
+            discobolus.create_disc(disc)
         # create zpool
         if not zfs.zpool_list(zpool):
-            zfs.zpool_create(zpool, disc)
+            zfs.zpool_create(zpool, vdev)
         # create zfs
         for fs in zfs_scheme[zpool]['fs']:
             if not zfs.zfs_list(fs['name']):

@@ -11,7 +11,12 @@ Play with ZFS
 
  - create SL64_box using [veewee-SL64-box](https://github.com/wilas/veewee-SL64-box)
  - copy ssh_keys from [ssh-gerwazy](https://github.com/wilas/ssh-gerwazy)
- - ssh root@77.77.77.99
+
+```
+    vagrant up 
+    ssh root@77.77.77.99 #zetta
+    vagrant destroy
+```
 
 ## Good to know
 
@@ -74,7 +79,6 @@ hanoi backup rotation scheme
 ## TODO
 
  - Unix/Unix-like (solaris, openindiana11, smartOS, omnios, freebsd) vagrant box
- - improve zfswrapper.zpool_create
  - clear zfsguard.py code
  - play with zfs send/receive over ssh
  - write unittests

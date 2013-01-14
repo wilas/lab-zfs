@@ -1,5 +1,5 @@
 {
-    "galaxy01": { "disc":"/var/tmp/disc01.file",
+    "galaxy01": { "vdev": ["mirror", "/var/tmp/disc10.file", "/var/tmp/disc11.file", "mirror", "/var/tmp/disc12.file", "/var/tmp/disc13.file"],
                   "fs": [
                     {"name":"galaxy01/fleet11" },
                     {"name":"galaxy01/fleet12" },
@@ -7,14 +7,14 @@
                     ]
 
     },
-    "galaxy02": { "disc": "/var/tmp/disc02.file",
+    "galaxy02": { "vdev": ["/var/tmp/disc20.file"],
                   "fs": [
                     {"name":"galaxy02/fleet21" },
                     {"name":"galaxy02/fleet22" },
                     {"name":"galaxy02/fleet23" }
                     ]
     },
-    "galaxy03": { "disc": "/var/tmp/disc03.file",
+    "galaxy03": { "vdev": ["raidz2", "/var/tmp/disc30.file", "/var/tmp/disc31.file", "/var/tmp/disc32.file"],
                   "fs": [
                     {"name":"galaxy03/fleet31" },
                     {"name":"galaxy03/fleet32" },

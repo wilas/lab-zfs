@@ -16,6 +16,10 @@
 # src page: github.com/wilas/zfs-soup/tools
 #
 
+# Read before use:
+# - zfswrapper tested with ZFS pool version 28 #zpool upgrade -v
+# - zfswrapper.zfs_get not work with white space in pool, fs and snapshot name.
+
 import subprocess
 
 _zfs = '/sbin/zfs'
@@ -96,14 +100,22 @@ def zfs_snapshot(fs, tag, recursive=False, properties={}):
     cmd += ['%s@%s' % (fs, tag)]
     _run(cmd)
 
+def zpool_add(pool, vdev):
+    """vdev is a list"""
+    cmd = [_zpool, 'add', '-f', pool] + vdev
+    _run(cmd)
+
 def zpool_attach(pool, device, new_device):
     cmd = [_zpool, 'attach', '-f', pool, device, new_device]
     _run(cmd)
 
-def zpool_create(pool, vdev):
-    """very simple creation, no raidz etc..."""
-    #TODO: play with vdev , e.g. raidz
-    cmd = [_zpool, 'create', pool, vdev]
+def zpool_create(pool, vdev, properties={}):
+    """vdev is a list"""
+    cmd = [_zpool, 'create']
+    for property, value in properties.iteritems():
+        cmd += ['-o','%s=%s' % (property, value)]
+    cmd += [pool]
+    cmd += vdev
     _run(cmd)
 
 def zpool_destroy(pool):
@@ -126,6 +138,3 @@ def zpool_list(pool=None):
         return None
     return output.splitlines()
 
-def zpool_status(pool=None):
-    #TODO: implement
-    raise NotImplementedError("not implement yet - sorry")
