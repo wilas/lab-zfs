@@ -19,7 +19,6 @@
 import string
 import time
 
-import discobolus
 import zfswrapper as zfs
 
 def _get_class_list(nr):
@@ -82,15 +81,15 @@ def backup_guard(fs, class_nr):
             old_snapshot = filter(lambda x: x[backup_property]==class_list[ptr], srt_snapshots)
 
             # create snapshot tag using time
-            #timestamp = time.strftime('%Y%m%d%H%M%S')
-            timestamp = time.time()
+            timestamp = time.strftime('%Y%m%d%H%M%S')
+            #timestamp = time.time()
             tag = '%s-%s' % (filtr_prefix, timestamp)
 
             try:
                 print "to create: {'%s': '%s', '%s': '%s'}" % (backup_property, class_label, backup_control_nr, next_control_nr)
                 # make new snapshot - if not made then exception is throw from zfswrapper  
                 zfs.zfs_snapshot(fs, tag, properties={backup_property:class_label, backup_control_nr:next_control_nr})
-            except ZfsException as e:
+            except zfs.ZfsException as e:
                 print 'Create new snapshot fail (FYI: old snapshots not destroyed):', e
             else:
                 # delete old snapshots if new snapshot was taken

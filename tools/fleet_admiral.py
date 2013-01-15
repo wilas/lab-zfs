@@ -19,10 +19,19 @@
 import string
 import re
 import json
+import os
+import subprocess
 
-import discobolus
 import zfswrapper as zfs
 
+def _create_disc(filename):
+    """create 64MB disck using file if file not exist"""
+    if os.path.isfile(filename):
+        print 'file exist', filename
+        return False
+    subprocess.call(['dd', 'if=/dev/zero', 'of=%s' % filename, 'bs=1024', 'count=65536'])
+    subprocess.call(["ls","-l",filename])
+    return True
 
 def _load_zfs_scheme(filename):
     with open(filename,'r') as file:
@@ -39,7 +48,7 @@ def _create_filesystem(zfs_scheme):
         discs = filter(lambda x: not regex.search(x), vdev)
         # create discs to play
         for disc in discs:
-            discobolus.create_disc(disc)
+            _create_disc(disc)
         # create zpool
         if not zfs.zpool_list(zpool):
             zfs.zpool_create(zpool, vdev)
