@@ -79,9 +79,7 @@ hanoi backup rotation scheme
 ## TODO
 
  - Unix/Unix-like (solaris, openindiana11, smartOS, omnios, freebsd) vagrant box
- - clear zfsguard.py code
  - play with zfs send/receive over ssh
- - write unittests
 
 
 ## Copyright and license
