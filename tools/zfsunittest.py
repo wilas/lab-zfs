@@ -4,8 +4,10 @@ import tempfile
 import unittest
 
 class ZfsTestCase(unittest.TestCase):
+    """Class with helpful methods for clear testing zfs"""
 
     def _zpool_generate(self, zpool_name, fs_names=[], snapshots=[]):
+        """Generate temporary pool"""
         # create disc as 64MB tempfile
         handle, self.path = tempfile.mkstemp('.zfsdisc')
         with os.fdopen(handle, 'wb') as f:
@@ -25,6 +27,7 @@ class ZfsTestCase(unittest.TestCase):
         #subprocess.call(['zfs', 'list', '-t', 'snapshot,filesystem'])
 
     def _zpool_clean(self, zpool_name):
+        """Remove temporary pool"""
         # destroy pool
         subprocess.call(['zpool', 'destroy', zpool_name])
         # remove temp disc

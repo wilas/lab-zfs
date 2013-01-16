@@ -21,52 +21,69 @@ import time
 
 import zfswrapper as zfs
 
+# Settings
+_filtr_prefix = 'hanoi'
+_backup_control_nr = 'backup:cycle_nr'
+_backup_property = 'backup:class'
+
+
 def _get_class_list(nr):
     """Return list nr first classes from 26 letter alphabet.
     For nr>26 return also list 26 first classes. """
     return list(string.uppercase)[:nr]
 
-
-def backup_guard(fs, class_nr):
-    """http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi
-    cover [2^(n-2)+1; 2^(n-1)] days/time_units
-    Info: 26 classes cover 2^24 + 1 = 16777217 time_units
-    """
-
-    filtr_prefix = 'hanoi'
-    backup_control_nr = 'backup:cycle_nr'
-    backup_property = 'backup:class'
-    class_list = _get_class_list(class_nr)
+def _get_next_control_number(snapshots_list, modulov):
+    """Return next number for backup_control_nr"""
     next_control_nr = 0
-    modulov = 2**(class_nr-1)
-    
-    all_snapshots = zfs.zfs_list(fs=fs, types='snapshot') or []
+    if snapshots_list:
+        #help if we have some old snapshots without control_nr or with some bugs...
+        try:
+            prev = int(snapshots_list[0][_backup_control_nr])
+        except ValueError:
+            next_control_nr = 0
+        else:
+            next_control_nr = (prev + 1) % modulov
+    return next_control_nr
 
-    filtr_snapshots = filter(lambda x: x.startswith('%s@%s' % (fs, filtr_prefix)), all_snapshots)
+def _get_current_hanoi_state(snapshots_list):
+    """Return list of dictionaries, where each element list is 
+    snapshot properties dictionary. List is sorted by snapshot creation time.
+    Snapshot list contain only snapshot with prefix name equal  _filtr_prefix.
+    """
+    filtr_snapshots = filter(lambda x: x.startswith('%s@%s' % (fs, _filtr_prefix)), snapshots_list)
     #TODO: filtr out broken - no control_num, no_class ... ?!
 
     info_list = []
     for snapshot in filtr_snapshots:
-        info = zfs.zfs_get(snapshot, property='name,creation,%s,%s' % (backup_property, backup_control_nr))
+        info = zfs.zfs_get(snapshot, property='name,creation,%s,%s' % (_backup_property, _backup_control_nr))
         info_list.append(info)
 
     srt_snapshots = sorted(info_list, key=lambda snap: snap['creation'], reverse=True )
     for snap in srt_snapshots:
         print snap
+    return srt_snapshots
 
-    # get next_control_nr
-    if srt_snapshots:
-        #help if we have some old snapshots without control_nr or with some bugs...
-        try:
-            prev = int(srt_snapshots[0][backup_control_nr])
-        except ValueError:
-            next_control_nr = 0
-        else:
-            next_control_nr = (prev + 1) % modulov
+
+def backup_guard(fs, class_nr):
+    """Guard tower of hanoi backup rotation scheme:
+    http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi
+    It cover [2^(n-2)+1; 2^(n-1)] days/time_units, where n is class_nr.
+    Fast calculation: 26 classes cover at least 2^24 + 1 = 16777217 time_units
+    """
+
+    class_list = _get_class_list(class_nr)
+    modulov = 2**(class_nr-1)
+    
+    # get all snapshots given fs
+    all_snapshots = zfs.zfs_list(fs=fs, types='snapshot') or []
+    # get list of snapshots and properties sorted by creation time.
+    srt_snapshots = _get_current_hanoi_state(all_snapshots)
+    # get control number - useful for debuging and checking hanoi rotation scheme
+    next_control_nr = _get_next_control_number(srt_snapshots, modulov)
 
     for ptr in range(0, class_nr):
         # last must be replaced anyway; do we have enough snapshots; snapshot has proper class
-        if (len(class_list)-1>ptr) and (len(srt_snapshots) > ptr) and (srt_snapshots[ptr][backup_property] == class_list[ptr]):
+        if (len(class_list)-1>ptr) and (len(srt_snapshots) > ptr) and (srt_snapshots[ptr][_backup_property] == class_list[ptr]):
             continue
         else:
             # Hanoi rotation method has the drawback of overwriting
@@ -78,17 +95,16 @@ def backup_guard(fs, class_nr):
                 class_label = class_list[-1]
 
             # get all old snapshots same class
-            old_snapshot = filter(lambda x: x[backup_property]==class_list[ptr], srt_snapshots)
+            old_snapshot = filter(lambda x: x[_backup_property]==class_list[ptr], srt_snapshots)
 
             # create snapshot tag using time
             timestamp = time.strftime('%Y%m%d%H%M%S')
-            #timestamp = time.time()
-            tag = '%s-%s' % (filtr_prefix, timestamp)
+            tag = '%s-%s' % (_filtr_prefix, timestamp)
 
             try:
-                print "to create: {'%s': '%s', '%s': '%s'}" % (backup_property, class_label, backup_control_nr, next_control_nr)
+                print "to create: {'%s': '%s', '%s': '%s'}" % (_backup_property, class_label, _backup_control_nr, next_control_nr)
                 # make new snapshot - if not made then exception is throw from zfswrapper  
-                zfs.zfs_snapshot(fs, tag, properties={backup_property:class_label, backup_control_nr:next_control_nr})
+                zfs.zfs_snapshot(fs, tag, properties={_backup_property:class_label, _backup_control_nr:next_control_nr})
             except zfs.ZfsException as e:
                 print 'Create new snapshot fail (FYI: old snapshots not destroyed):', e
             else:
@@ -100,5 +116,6 @@ def backup_guard(fs, class_nr):
             break
 
 if __name__ == '__main__':
-    fs='galaxy01/fleet11'
-    backup_guard(fs, 5)
+    fs = 'galaxy01/fleet11'
+    class_nr = 5
+    backup_guard(fs, class_nr)
