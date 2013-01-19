@@ -20,6 +20,7 @@ import string
 import re
 import json
 import os
+import sys
 import subprocess
 
 import zfswrapper as zfs
@@ -59,6 +60,9 @@ def _create_filesystem(zfs_scheme):
 
 if __name__ == '__main__':
     starfleet = 'starfleet.json'
+    # json file as an argument
+    if len(sys.argv) > 1:
+        starfleet = sys.argv[1]
     zfs_scheme =  _load_zfs_scheme(starfleet)
     _create_filesystem(zfs_scheme)
 

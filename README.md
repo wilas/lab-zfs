@@ -1,11 +1,12 @@
 # Description
 
-Play with ZFS
+Playing with ZFS.
 
 ## VM description:
 
  - OS: Scientific linux 6
  - machine with zfs: zetta.farm
+ - machine with zfs: zepto.farm
 
 ## Howto
 
@@ -15,17 +16,22 @@ Play with ZFS
 ```
     vagrant up 
     ssh root@77.77.77.99 #zetta
+    ssh root@77.77.77.98 #zepto
     vagrant destroy
 ```
 
-## Good to know
+## Good to know:
 
  - why not fuse: http://lists.debian.org/debian-user/2012/05/msg01026.html
  - check zpool: `zpool status` or `zpool list`
  - check zfs: `zfs list -t filesystem,snapshot`
+ - destroy zpool: `zpool destroy pool_name`
+ - destroy zfs: `zfs destroy -r zfs_name`
+ - destroy snapshot: `zfs destroy -r snapshot_name`
  - zfswrapper.py - simple python wrapper for zfs
  - fleet_admiral.py - setup demo from json file
  - zfsguard.py - tower_of_hanoi backup rotation scheme using zfs snapshot: http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi
+ - interstellar_teleporter.py - send and receive demo
  
 ## Play time:
 
@@ -45,8 +51,28 @@ backup and restore
 hanoi backup rotation scheme
 ```
     python /vagrant/tools/fleet_admiral.py #setup demo 
-    python /vagrant/tools/zfsguard.py #run as many times you want, change sth in main
+    python /vagrant/tools/zfsguard.py #run as many times you want, but not too frequently (e.g. 1 per sec.)
     zfs list -t snapshot,filesystem
+```
+
+send and receive
+```
+    # ssh to zetta
+    python /vagrant/tools/fleet_admiral.py #setup demo
+    cd /galaxy01/fleet11 && echo 'fleet11-red' > test.txt
+    zfs list -t filesystem,snapshot
+    # ssh to zepto
+    python /vagrant/tools/fleet_admiral.py starfleet_slave.json #setup demo
+    ls -la /galaxy_slave01/fleet11_alfa
+    zfs list -t filesystem,snapshot
+    # ssh to zetta
+    python /vagrant/tools/interstellar_teleporter.py #run send/receive demo
+    cat /galaxy02/fleet11_alfa/test.txt
+    zfs list -t filesystem,snapshot
+    # ssh to zepto
+    cat /galaxy_slave01/fleet11_alfa/test.txt
+    zfs list -t filesystem,snapshot
+    # want play again? edit recv_fs in interstellar_teleporter.py to some non-existing
 ```
 
 ## Bibliography
@@ -70,16 +96,16 @@ hanoi backup rotation scheme
  - Zfs quick tutorial: http://www.mattzone.com/site/index.php?name=News&file=article&sid=3
 
 ### More ZFS
+ - Send/receive: http://docs.oracle.com/cd/E19963-01/html/821-1448/gbchx.html
+ - Send/receive fun: http://www.128bitstudios.com/2010/07/23/fun-with-zfs-send-and-receive/
  - Zfs replication: http://phillipcooper.co.uk/2011/12/zfs-replication/
  - Incremental backups over ssh: http://www.aisecure.net/2012/01/11/automated-zfs-incremental-backups-over-ssh/
- - Send/receive fun: http://www.128bitstudios.com/2010/07/23/fun-with-zfs-send-and-receive/
  - Zfs raid-z: http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/filesystems-zfs.html
 
 
 ## TODO
 
- - Unix/Unix-like (solaris, openindiana11, smartOS, omnios, freebsd) vagrant box
- - play with zfs send/receive over ssh
+ - Unix/Unix-like (illumos, smartOS, omnios, freebsd) vagrant box
 
 
 ## Copyright and license

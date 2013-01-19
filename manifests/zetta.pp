@@ -7,9 +7,13 @@ class { "basic_package": stage => "base" }
 class { "user::root": stage    => "base"}
 
 # /etc/hosts
-host { "$fqdn":
-    ip           => "$ipaddress_eth1",
-    host_aliases => "$hostname",
+host { "zetta.farm":
+    ip           => "77.77.77.99",
+    host_aliases => "zetta",
+}
+host { "zepto.farm":
+    ip           => "77.77.77.98",
+    host_aliases => "zepto",
 }
 
 # firewall manage

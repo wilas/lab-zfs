@@ -24,6 +24,7 @@ import subprocess
 
 _zfs = '/sbin/zfs'
 _zpool = '/sbin/zpool'
+_ssh = '/usr/bin/ssh'
 
 class ZfsException(Exception):
 
@@ -46,7 +47,7 @@ def _run(args):
     return message
 
 def zfs_create(fs, properties={}):
-    cmd = [_zfs, 'create']
+    cmd = [_zfs, 'create', '-p']
     for property, value in properties.iteritems():
         cmd += ['-o','%s=%s' % (property, value)]
     cmd += [fs]
@@ -87,6 +88,32 @@ def zfs_list(fs=None, types='filesystem,snapshot', depth=None):
         return None
     return output.splitlines()
 
+def zfs_receive(fs, options=[], ssh_host=None):
+    """return tuple (proc, cmd)"""
+    cmd = [_zfs, 'recv']
+    if options:
+        cmd += options
+    cmd += [fs]
+    if ssh_host:
+        cmd = [_ssh, ssh_host] + cmd
+    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, 
+            stderr=subprocess.PIPE, bufsize=-1)
+    return (proc, cmd)
+
+def zfs_send(fs, tag, recursive=False, options=[], ssh_host=None):
+    """return tuple (proc, cmd)"""
+    cmd = [_zfs, 'send']
+    if recursive:
+        cmd += ['-R']
+    if options:
+        cmd += options
+    cmd += ['%s@%s' % (fs, tag)]
+    if ssh_host:
+        cmd = [_ssh, ssh_host] + cmd
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE, bufsize=-1)
+    return (proc, cmd)
+
 def zfs_set(fs, property, value):
     cmd = [_zfs, 'set', '%s=%s' % (property, value), fs]
     _run(cmd)
@@ -99,6 +126,29 @@ def zfs_snapshot(fs, tag, recursive=False, properties={}):
         cmd += ['-o','%s=%s' % (property, value)]
     cmd += ['%s@%s' % (fs, tag)]
     _run(cmd)
+
+def zfs_teleport_snapshot(send_fs, snapshot_tag, recv_fs, recv_host=None):
+    """send and receive snapshot"""
+    sender, sender_cmd = zfs_send(send_fs, snapshot_tag, recursive=True)
+    receiver, receiver_cmd  = zfs_receive(recv_fs, options=['-F'], ssh_host=recv_host)
+    for data in sender.stdout:
+        receiver.stdin.write(data)
+    # sender close stdout,stderr stream, get returncode and read error_message
+    sender.stdout.close()
+    sender.wait()
+    sender_error = sender.stderr.read()
+    sender.stderr.close()
+    # receiver close stdin,stderr stream, get returncode and read error_message
+    receiver.stdin.close()
+    receiver.wait()
+    receiver_error = receiver.stderr.read()
+    receiver.stderr.close()
+    # raise exception if any error
+    if sender.returncode or receiver.returncode:
+        args = 'sender_cmd:%s receiver_cmd:%s' % (sender_cmd, receiver_cmd)
+        error_code = 's:%sr:%s' % (sender.returncode, receiver.returncode)
+        error_message = 'sender_error:%s receiver_error:%s' % (sender_error, receiver_error)
+        raise ZfsException(args, error_code, error_message)
 
 def zpool_add(pool, vdev):
     """vdev is a list"""

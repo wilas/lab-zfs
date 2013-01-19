@@ -43,7 +43,7 @@ class ZfswrapperTest(zfsunittest.ZfsTestCase):
     
     def test_zfs_list_not_existing_fs(self):
         """zfs_list return None if specified fs not exist"""
-        zlist = zfs.zfs_list(fs='not_existing_filesystem')
+        zlist = zfs.zfs_list(fs='non_existing_filesystem')
         self.assertEqual(zlist, None)
 
 if __name__ == '__main__':

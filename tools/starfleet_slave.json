@@ -1,0 +1,11 @@
+{
+    "galaxy_slave01": { "vdev": ["mirror", "/var/tmp/disc10s.file", "/var/tmp/disc11s.file"],
+                  "fs": [
+                    {"name":"galaxy_slave01/fleet11" }
+                    ]
+
+    },
+    "galaxy_slave02": { "vdev": ["/var/tmp/disc20s.file"],
+                  "fs": []
+    }
+}
