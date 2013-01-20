@@ -22,6 +22,7 @@ import json
 import os
 import sys
 import subprocess
+import time
 
 import zfswrapper as zfs
 
@@ -56,10 +57,10 @@ def load_zfs_scheme(filename):
 
 def create_filesystem(zfs_scheme):
     """Creates zfs datasets from given zfs_scheme.
-    
+
     :param zfs_scheme: python reprezentation of zfs datasets
     :type zfs_scheme: dict
-    :raises: :class:`zfswrapper.ZfsException`
+    :raises: zfswrapper.ZfsException
     """
     for zpool  in zfs_scheme:
         # extract discs from vdev description
@@ -70,6 +71,7 @@ def create_filesystem(zfs_scheme):
         # create discs to play
         for disc in discs:
             create_disc(disc)
+            time.sleep(0.5)
         # create zpool
         if not zfs.zpool_list(zpool):
             zfs.zpool_create(zpool, vdev)

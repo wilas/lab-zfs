@@ -39,3 +39,13 @@ class { "basic_firewall": }
 class { "zfsonlinux": 
     version => "0.6.0-rc12",
 }
+package { "python-setuptools":
+    ensure => installed,
+}
+exec { "install py-zfswrapper": 
+    command => 'python setup.py install && touch /opt/py-zfswrapper.files',
+    path    => "/bin:/sbin:/usr/bin:/usr/sbin",
+    cwd     => "/vagrant/tools/py-zfswrapper",
+    creates => "/opt/py-zfswrapper.files",
+    require => Package['python-setuptools'],
+}

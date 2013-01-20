@@ -77,17 +77,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/zfswrapper.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/zfs-soup.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/zfswrapper.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/zfs-soup.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/zfswrapper"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/zfswrapper"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/zfs-soup"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/zfs-soup"
 	@echo "# devhelp"
 
 epub:

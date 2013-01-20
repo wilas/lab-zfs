@@ -28,7 +28,6 @@ Playing with ZFS file system.
  - destroy zpool: `zpool destroy pool_name`
  - destroy zfs: `zfs destroy -r zfs_name`
  - destroy snapshot: `zfs destroy -r snapshot_name`
- - zfswrapper.py - simple python wrapper for zfs
  - fleet_admiral.py - setup demo from json file
  - zfsguard.py - tower_of_hanoi backup rotation scheme using zfs snapshot: http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi
  - interstellar_teleporter.py - send and receive demo
