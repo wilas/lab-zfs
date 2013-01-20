@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# src page: github.com/wilas/zfs-soup/tools
+# src page: github.com/wilas/zfs-soup/
 #
 
 import string
@@ -25,22 +25,42 @@ import subprocess
 
 import zfswrapper as zfs
 
-def _create_disc(filename):
-    """create 64MB disck using file if file not exist"""
+def create_disc(filename):
+    """Creates 64MB demo file/disc for given filename only if file not exist.
+    
+    :param filename: path to file
+    :type filename: str
+    :returns: bool -- True if disc was created or False if disc already exist or error during creation.
+    """
     if os.path.isfile(filename):
         print 'file exist', filename
         return False
-    subprocess.call(['dd', 'if=/dev/zero', 'of=%s' % filename, 'bs=1024', 'count=65536'])
+    result = subprocess.call(['dd', 'if=/dev/zero', 'of=%s' % filename, 'bs=1024', 'count=65536'])
+    if result: #returncode > 0, mean error during disc creation
+        print 'creation error', filename
+        return False
     subprocess.call(["ls","-l",filename])
     return True
 
-def _load_zfs_scheme(filename):
+def load_zfs_scheme(filename):
+    """Returns python object from given json file
+    
+    :param filename: path to json file
+    :type filename: str
+    :returns: dict -- python reprezentation of zfs datasets
+    """
     with open(filename,'r') as file:
         zfs_scheme = json.load(file)
     file.close()
     return zfs_scheme
 
-def _create_filesystem(zfs_scheme):
+def create_filesystem(zfs_scheme):
+    """Creates zfs datasets from given zfs_scheme.
+    
+    :param zfs_scheme: python reprezentation of zfs datasets
+    :type zfs_scheme: dict
+    :raises: :class:`zfswrapper.ZfsException`
+    """
     for zpool  in zfs_scheme:
         # extract discs from vdev description
         reserved = ['mirror', 'raidz[0-9]*', 'spare', 'log', 'cache']
@@ -49,7 +69,7 @@ def _create_filesystem(zfs_scheme):
         discs = filter(lambda x: not regex.search(x), vdev)
         # create discs to play
         for disc in discs:
-            _create_disc(disc)
+            create_disc(disc)
         # create zpool
         if not zfs.zpool_list(zpool):
             zfs.zpool_create(zpool, vdev)
@@ -59,10 +79,10 @@ def _create_filesystem(zfs_scheme):
                 zfs.zfs_create(fs['name'])
 
 if __name__ == '__main__':
-    starfleet = 'starfleet.json'
+    starfleet = 'json_galaxy/starfleet.json'
     # json file as an argument
     if len(sys.argv) > 1:
         starfleet = sys.argv[1]
-    zfs_scheme =  _load_zfs_scheme(starfleet)
-    _create_filesystem(zfs_scheme)
+    zfs_scheme =  load_zfs_scheme(starfleet)
+    create_filesystem(zfs_scheme)
 

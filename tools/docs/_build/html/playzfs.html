@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>py-zfswrapper in use &mdash; zfswrapper 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="zfswrapper 0.2 documentation" href="index.html" />
+    <link rel="prev" title="Documentation for the Tests" href="test_zfswrapper.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="test_zfswrapper.html" title="Documentation for the Tests"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">zfswrapper 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="py-zfswrapper-in-use">
+<h1>py-zfswrapper in use<a class="headerlink" href="#py-zfswrapper-in-use" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-zfsguard">
+<span id="zfsguard-py"></span><h2>zfsguard.py<a class="headerlink" href="#module-zfsguard" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="zfsguard.backup_guard">
+<tt class="descclassname">zfsguard.</tt><tt class="descname">backup_guard</tt><big>(</big><em>fs</em>, <em>class_nr</em><big>)</big><a class="headerlink" href="#zfsguard.backup_guard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Guard tower of hanoi backup rotation scheme:
+<a class="reference external" href="http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi">http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi</a></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>It cover [2^(n-2)+1; 2^(n-1)] days/time_units, where n is class_nr.</p>
+<p class="last">Fast calculation: 26 classes cover at least 2^24 + 1 = 16777217 time_units</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fs</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; zfs filesystem/volume name to backup</li>
+<li><strong>class_nr</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of class used for rotation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-fleet_admiral">
+<span id="fleet-admiral-py"></span><h2>fleet_admiral.py<a class="headerlink" href="#module-fleet_admiral" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fleet_admiral.create_disc">
+<tt class="descclassname">fleet_admiral.</tt><tt class="descname">create_disc</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#fleet_admiral.create_disc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates 64MB demo file/disc for given filename only if file not exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True if disc was created or False if disc already exist or error during creation.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fleet_admiral.create_filesystem">
+<tt class="descclassname">fleet_admiral.</tt><tt class="descname">create_filesystem</tt><big>(</big><em>zfs_scheme</em><big>)</big><a class="headerlink" href="#fleet_admiral.create_filesystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates zfs datasets from given zfs_scheme.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>zfs_scheme</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; python reprezentation of zfs datasets</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="zfswrapper.html#zfswrapper.ZfsException" title="zfswrapper.ZfsException"><tt class="xref py py-class docutils literal"><span class="pre">zfswrapper.ZfsException</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fleet_admiral.load_zfs_scheme">
+<tt class="descclassname">fleet_admiral.</tt><tt class="descname">load_zfs_scheme</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#fleet_admiral.load_zfs_scheme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns python object from given json file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to json file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; python reprezentation of zfs datasets</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="interstellar-teleporter-py">
+<h2>interstellar_teleporter.py<a class="headerlink" href="#interstellar-teleporter-py" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-interstellar_teleporter"></span><dl class="function">
+<dt id="interstellar_teleporter.replication_simulator">
+<tt class="descclassname">interstellar_teleporter.</tt><tt class="descname">replication_simulator</tt><big>(</big><big>)</big><a class="headerlink" href="#interstellar_teleporter.replication_simulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Demo - send and receive snapshot.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">recv_fs can&#8217;t exist on recv_host, otherwise error is risen</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">py-zfswrapper in use</a><ul>
+<li><a class="reference internal" href="#module-zfsguard">zfsguard.py</a></li>
+<li><a class="reference internal" href="#module-fleet_admiral">fleet_admiral.py</a></li>
+<li><a class="reference internal" href="#interstellar-teleporter-py">interstellar_teleporter.py</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="test_zfswrapper.html"
+                        title="previous chapter">Documentation for the Tests</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="test_zfswrapper.html" title="Documentation for the Tests"
+             >previous</a> |</li>
+        <li><a href="index.html">zfswrapper 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Kamil Wilas.
+    </div>
+  </body>
+</html>

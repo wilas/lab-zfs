@@ -1,0 +1,176 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Documentation for the Tests &mdash; zfswrapper 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="zfswrapper 0.2 documentation" href="index.html" />
+    <link rel="next" title="zfswrapper in use" href="playzfs.html" />
+    <link rel="prev" title="Documentation for the Code" href="zfswrapper.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="playzfs.html" title="zfswrapper in use"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zfswrapper.html" title="Documentation for the Code"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">zfswrapper 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="documentation-for-the-tests">
+<h1>Documentation for the Tests<a class="headerlink" href="#documentation-for-the-tests" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-zfsunittest">
+<span id="zfsunittest-py"></span><h2>zfsunittest.py<a class="headerlink" href="#module-zfsunittest" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="zfsunittest.ZfsTestCase">
+<em class="property">class </em><tt class="descclassname">zfsunittest.</tt><tt class="descname">ZfsTestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="headerlink" href="#zfsunittest.ZfsTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class with helpful methods for clear testing zfs.</p>
+<p>Inherit from <a class="reference external" href="http://docs.python.org/library/unittest.html#unittest.TestCase" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">unittest.TestCase</span></tt></a></p>
+<dl class="method">
+<dt id="zfsunittest.ZfsTestCase._zpool_generate">
+<tt class="descname">_zpool_generate</tt><big>(</big><em>zpool_name</em>, <em>fs_names=</em><span class="optional">[</span><span class="optional">]</span>, <em>snapshots=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#zfsunittest.ZfsTestCase._zpool_generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate temporary pool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zfsunittest.ZfsTestCase._zpool_clean">
+<tt class="descname">_zpool_clean</tt><big>(</big><em>zpool_name</em><big>)</big><a class="headerlink" href="#zfsunittest.ZfsTestCase._zpool_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove temporary pool</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-test_zfswrapper">
+<span id="test-zfswrapper-py"></span><h2>test_zfswrapper.py<a class="headerlink" href="#module-test_zfswrapper" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="test_zfswrapper.ZfswrapperTest">
+<em class="property">class </em><tt class="descclassname">test_zfswrapper.</tt><tt class="descname">ZfswrapperTest</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="headerlink" href="#test_zfswrapper.ZfswrapperTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherit from <a class="reference internal" href="#zfsunittest.ZfsTestCase" title="zfsunittest.ZfsTestCase"><tt class="xref py py-class docutils literal"><span class="pre">zfsunittest.ZfsTestCase</span></tt></a></p>
+<dl class="method">
+<dt id="test_zfswrapper.ZfswrapperTest.test_zfs_list">
+<tt class="descname">test_zfs_list</tt><big>(</big><big>)</big><a class="headerlink" href="#test_zfswrapper.ZfswrapperTest.test_zfs_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>zfs_list without args - return list all filesystems and snapshots. By default volumes are not included.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="test_zfswrapper.ZfswrapperTest.test_zfs_list_defined_fs">
+<tt class="descname">test_zfs_list_defined_fs</tt><big>(</big><big>)</big><a class="headerlink" href="#test_zfswrapper.ZfswrapperTest.test_zfs_list_defined_fs" title="Permalink to this definition">¶</a></dt>
+<dd><p>zfs_list with defined fs - return list only filesystems and snapshots given fs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="test_zfswrapper.ZfswrapperTest.test_zfs_list_defined_types">
+<tt class="descname">test_zfs_list_defined_types</tt><big>(</big><big>)</big><a class="headerlink" href="#test_zfswrapper.ZfswrapperTest.test_zfs_list_defined_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>zfs_list with defined types - return list all &#8216;types&#8217; for given fs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="test_zfswrapper.ZfswrapperTest.test_zfs_list_not_existing_fs">
+<tt class="descname">test_zfs_list_not_existing_fs</tt><big>(</big><big>)</big><a class="headerlink" href="#test_zfswrapper.ZfswrapperTest.test_zfs_list_not_existing_fs" title="Permalink to this definition">¶</a></dt>
+<dd><p>zfs_list return None if given fs not exist</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Documentation for the Tests</a><ul>
+<li><a class="reference internal" href="#module-zfsunittest">zfsunittest.py</a></li>
+<li><a class="reference internal" href="#module-test_zfswrapper">test_zfswrapper.py</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zfswrapper.html"
+                        title="previous chapter">Documentation for the Code</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="playzfs.html"
+                        title="next chapter">zfswrapper in use</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="playzfs.html" title="zfswrapper in use"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zfswrapper.html" title="Documentation for the Code"
+             >previous</a> |</li>
+        <li><a href="index.html">zfswrapper 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Kamil Wilas.
+    </div>
+  </body>
+</html>

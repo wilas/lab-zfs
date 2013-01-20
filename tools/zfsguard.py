@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# src page: github.com/wilas/zfs-soup/tools
+# src page: github.com/wilas/zfs-soup/
 #
 
 import string
@@ -67,8 +67,16 @@ def _get_current_hanoi_state(snapshots_list):
 def backup_guard(fs, class_nr):
     """Guard tower of hanoi backup rotation scheme:
     http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi
-    It cover [2^(n-2)+1; 2^(n-1)] days/time_units, where n is class_nr.
-    Fast calculation: 26 classes cover at least 2^24 + 1 = 16777217 time_units
+
+    .. note::
+        It cover [2^(n-2)+1; 2^(n-1)] days/time_units, where n is class_nr.
+
+        Fast calculation: 26 classes cover at least 2^24 + 1 = 16777217 time_units
+    
+    :param fs: zfs filesystem/volume name to backup
+    :type fs: str
+    :param class_nr: number of class used for rotation
+    :type class_nr: int
     """
 
     class_list = _get_class_list(class_nr)

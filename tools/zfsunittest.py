@@ -4,7 +4,10 @@ import tempfile
 import unittest
 
 class ZfsTestCase(unittest.TestCase):
-    """Class with helpful methods for clear testing zfs"""
+    """Class with helpful methods for clear testing zfs.
+    
+    Inherit from :class:`unittest.TestCase`
+    """
 
     def _zpool_generate(self, zpool_name, fs_names=[], snapshots=[]):
         """Generate temporary pool"""

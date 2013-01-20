@@ -1,6 +1,6 @@
 # Description
 
-Playing with ZFS.
+Playing with ZFS file system.
 
 ## VM description:
 
@@ -61,18 +61,22 @@ send and receive
     python /vagrant/tools/fleet_admiral.py #setup demo
     cd /galaxy01/fleet11 && echo 'fleet11-red' > test.txt
     zfs list -t filesystem,snapshot
+    
     # ssh to zepto
-    python /vagrant/tools/fleet_admiral.py starfleet_slave.json #setup demo
+    python /vagrant/tools/fleet_admiral.py json_galaxy/starfleet_slave.json #setup demo
     ls -la /galaxy_slave01/fleet11_alfa
     zfs list -t filesystem,snapshot
+    
     # ssh to zetta
     python /vagrant/tools/interstellar_teleporter.py #run send/receive demo
     cat /galaxy02/fleet11_alfa/test.txt
     zfs list -t filesystem,snapshot
+    
     # ssh to zepto
     cat /galaxy_slave01/fleet11_alfa/test.txt
     zfs list -t filesystem,snapshot
-    # want play again? edit recv_fs in interstellar_teleporter.py to some non-existing
+    
+    # want play again? edit recv_fs in interstellar_teleporter.py to some non-existing or remove some datasets
 ```
 
 ## Bibliography

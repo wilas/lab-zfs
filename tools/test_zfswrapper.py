@@ -3,6 +3,7 @@ import zfsunittest
 import zfswrapper as zfs
 
 class ZfswrapperTest(zfsunittest.ZfsTestCase):
+    """Inherit from :class:`zfsunittest.ZfsTestCase`"""
 
     def setUp(self):
         self.zpool_name = 'unittest01'
@@ -14,7 +15,7 @@ class ZfswrapperTest(zfsunittest.ZfsTestCase):
         self._zpool_clean(self.zpool_name)
 
     def test_zfs_list(self):
-        """zfs_list without args - return list all file systems and snapshots. By default volumes are not included."""
+        """zfs_list without args - return list all filesystems and snapshots. By default volumes are not included."""
         expected_fs = ['unittest01', 'unittest01/mine01', 'unittest01/mine02', 'unittest01/mine03', 
                 'unittest01/mine01@coal001', 'unittest01/mine01@coal002', 'unittest01/mine02@copper001']
         zlist = zfs.zfs_list()
@@ -22,7 +23,7 @@ class ZfswrapperTest(zfsunittest.ZfsTestCase):
             self.assertTrue(fs in zlist)
     
     def test_zfs_list_defined_fs(self):
-        """zfs_list with defined fs - return list only file systems and snapshots given fs"""
+        """zfs_list with defined fs - return list only filesystems and snapshots given fs"""
         expected_fs = ['unittest01/mine01', 'unittest01/mine01@coal001', 'unittest01/mine01@coal002']
         not_expected_fs = ['unittest01', 'unittest01/mine02', 'unittest01/mine03', 'unittest01/mine02@copper001']
         zlist = zfs.zfs_list(fs='unittest01/mine01')
@@ -42,7 +43,7 @@ class ZfswrapperTest(zfsunittest.ZfsTestCase):
             self.assertFalse(fs in zlist)
     
     def test_zfs_list_not_existing_fs(self):
-        """zfs_list return None if specified fs not exist"""
+        """zfs_list return None if given fs not exist"""
         zlist = zfs.zfs_list(fs='non_existing_filesystem')
         self.assertEqual(zlist, None)
 
