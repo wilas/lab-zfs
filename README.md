@@ -31,6 +31,7 @@ Playing with ZFS file system.
  - fleet_admiral.py - setup demo from json file
  - zfsguard.py - tower_of_hanoi backup rotation scheme using zfs snapshot: http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi
  - interstellar_teleporter.py - send and receive demo
+ - py-zfswrapper - ZFS filesystem wrapper for python: https://github.com/wilas/py-zfswrapper
  
 ## Play time:
 
