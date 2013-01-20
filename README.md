@@ -10,6 +10,7 @@ Playing with ZFS file system.
 
 ## Howto
 
+ - git submodule update
  - create SL64_box using [veewee-SL64-box](https://github.com/wilas/veewee-SL64-box)
  - copy ssh_keys from [ssh-gerwazy](https://github.com/wilas/ssh-gerwazy)
 
