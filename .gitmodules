@@ -1,3 +1,0 @@
-[submodule "tools/py-zfswrapper"]
-	path = tools/py-zfswrapper
-	url = https://github.com/wilas/py-zfswrapper
