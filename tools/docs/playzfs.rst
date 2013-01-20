@@ -14,7 +14,7 @@ fleet_admiral.py
    :members:
 
 interstellar_teleporter.py
-=========================
+===========================
 
 .. automodule:: interstellar_teleporter
    :members:
