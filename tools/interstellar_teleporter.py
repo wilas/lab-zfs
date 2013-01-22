@@ -37,12 +37,12 @@ def replication_simulator():
     # Remote repl. - using ssh
     recv_fs = 'galaxy_slave01/fleet11_alfa'
     #recv_fs = 'galaxy_slave01/fleet11_beta'
-    zfs.zfs_teleport_snapshot(send_fs, send_tag, recv_fs, recv_host='zepto')
+    zfs.zfs_teleport_snapshot(to_send, recv_fs, recv_host='zepto')
 
     # Local repl.
     recv_fs = 'galaxy02/fleet11_alfa'
     #recv_fs = 'galaxy02/fleet11_beta'
-    zfs.zfs_teleport_snapshot(send_fs, send_tag, recv_fs)
+    zfs.zfs_teleport_snapshot(to_send, recv_fs)
 
 
 if __name__ == '__main__':
