@@ -52,7 +52,6 @@ def load_zfs_scheme(filename):
     """
     with open(filename,'r') as file:
         zfs_scheme = json.load(file)
-    file.close()
     return zfs_scheme
 
 def create_filesystem(zfs_scheme):
