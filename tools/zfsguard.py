@@ -45,7 +45,7 @@ def _get_next_control_number(snapshots_list, modulov):
             next_control_nr = (prev + 1) % modulov
     return next_control_nr
 
-def _get_current_hanoi_state(snapshots_list):
+def _get_current_hanoi_state(fs, snapshots_list):
     """Return list of dictionaries, where each element list is 
     snapshot properties dictionary. List is sorted by snapshot creation time.
     Snapshot list contain only snapshot with prefix name equal  _filtr_prefix.
@@ -85,13 +85,17 @@ def backup_guard(fs, class_nr):
     # get all snapshots given fs
     all_snapshots = zfs.zfs_list(fs=fs, types='snapshot') or []
     # get list of snapshots and properties sorted by creation time.
-    srt_snapshots = _get_current_hanoi_state(all_snapshots)
+    srt_snapshots = _get_current_hanoi_state(fs, all_snapshots)
     # get control number - useful for debuging and checking hanoi rotation scheme
     next_control_nr = _get_next_control_number(srt_snapshots, modulov)
 
     for ptr in range(0, class_nr):
-        # last must be replaced anyway; do we have enough snapshots; snapshot has proper class
-        if (len(class_list)-1>ptr) and (len(srt_snapshots) > ptr) and (srt_snapshots[ptr][_backup_property] == class_list[ptr]):
+        # last must be replaced anyway;  snapshot has proper class
+        last_class = (ptr == class_nr-1)
+        has_proper_class = False
+        if len(srt_snapshots) > ptr:
+            has_proper_class = (srt_snapshots[ptr][_backup_property] == class_list[ptr])
+        if not last_class and has_proper_class:
             continue
         else:
             # Hanoi rotation method has the drawback of overwriting
@@ -103,7 +107,7 @@ def backup_guard(fs, class_nr):
                 class_label = class_list[-1]
 
             # get all old snapshots same class
-            old_snapshot = filter(lambda x: x[_backup_property]==class_list[ptr], srt_snapshots)
+            old_snapshot = filter(lambda x: x[_backup_property]==class_label, srt_snapshots)
 
             # create snapshot tag using time
             timestamp = time.strftime('%Y%m%d%H%M%S')
