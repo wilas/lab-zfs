@@ -22,7 +22,7 @@ import time
 import zfswrapper as zfs
 
 # Settings
-_filtr_prefix = 'hanoi'
+_filter_prefix = 'hanoi'
 _backup_control_nr = 'backup:cycle_nr'
 _backup_property = 'backup:class'
 
@@ -31,6 +31,7 @@ def _get_class_list(nr):
     """Return list nr first classes from 26 letter alphabet.
     For nr>26 return also list 26 first classes. """
     return list(string.uppercase)[:nr]
+
 
 def _get_next_control_number(snapshots_list, modulov):
     """Return next number for backup_control_nr"""
@@ -45,16 +46,18 @@ def _get_next_control_number(snapshots_list, modulov):
             next_control_nr = (prev + 1) % modulov
     return next_control_nr
 
+
 def _get_current_hanoi_state(fs, snapshots_list):
     """Return list of dictionaries, where each element list is 
     snapshot properties dictionary. List is sorted by snapshot creation time.
-    Snapshot list contain only snapshot with prefix name equal  _filtr_prefix.
+    Snapshot list contain only snapshot with prefix name equal  _filter_prefix.
     """
-    filtr_snapshots = filter(lambda x: x.startswith('%s@%s' % (fs, _filtr_prefix)), snapshots_list)
-    #TODO: filtr out broken - no control_num, no_class ... ?!
+    filter_snapshots = filter(lambda x: x.startswith('%s@%s' % (fs, _filter_prefix)), snapshots_list)
+    #TODO: filter out broken - no control_num, no_class... ?!
 
     info_list = []
-    for snapshot in filtr_snapshots:
+    for snapshot in filter_snapshots:
+        # get info about each snapshot - if problem ZfsException is throw
         info = zfs.zfs_get(snapshot, property='name,creation,%s,%s' % (_backup_property, _backup_control_nr))
         info_list.append(info)
 
@@ -64,8 +67,15 @@ def _get_current_hanoi_state(fs, snapshots_list):
     return srt_snapshots
 
 
+def _gen_snapshot_tag():
+    # create snapshot tag using time
+    timestamp = time.strftime('%Y%m%d%H%M%S')
+    tag = '%s-%s' % (_filter_prefix, timestamp)
+    return tag
+
+
 def backup_guard(fs, class_nr):
-    """Guard tower of hanoi backup rotation scheme:
+    """Guard tower of hanoi backup rotation scheme for ZFS:
     http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi
 
     .. note::
@@ -77,16 +87,57 @@ def backup_guard(fs, class_nr):
     :type fs: str
     :param class_nr: number of class used for rotation
     :type class_nr: int
+    :raises: zfswrapper.ZfsException
     """
-
-    class_list = _get_class_list(class_nr)
-    modulov = 2**(class_nr-1)
-    
+    # tag for new snapshot
+    snp_tag = _gen_snapshot_tag()
     # get all snapshots given fs
     all_snapshots = zfs.zfs_list(fs=fs, types='snapshot') or []
     # get list of snapshots and properties sorted by creation time.
     srt_snapshots = _get_current_hanoi_state(fs, all_snapshots)
-    # get control number - useful for debuging and checking hanoi rotation scheme
+    _hanoi_builder(fs, snp_tag, class_nr, srt_snapshots)
+
+
+def backup_guard_recurse(pool, class_nr):
+    """Recurse version tower of hanoi backup rotation scheme for ZFS:
+    http://en.wikipedia.org/wiki/Backup_rotation_scheme#Tower_of_Hanoi
+    Snapshots are taken atomically, so that all recursive snapshots corre-
+    spond to the same moment in time.
+
+    :param fs: zpool name to backup (snapshot make also for all child zfs)
+    :type fs: str
+    :param class_nr: number of class used for rotation
+    :type class_nr: int
+    :raises: zfswrapper.ZfsException
+    """
+    # tag for new snapshot
+    snp_tag = _gen_snapshot_tag()
+    unknown_label = 'unknown'
+    unknown_control_nr = 'X'
+
+    # make new recursive snapshot - if problem ZfsException is throw
+    zfs.zfs_snapshot(fs=pool, tag=snp_tag, recurse=True, 
+            properties={_backup_property:unknown_label, _backup_control_nr:unknown_control_nr})
+    # get all filesystem given pool
+    all_fs = zfs.zfs_list(fs=pool, types='filesystem') or []
+    for fs in all_fs:
+        print 'fs', fs
+        ## Note: you can set class_num per filesystem, exclude some zfs filesystems, e.g. pool
+        # get all snapshots given fs
+        fs_snapshots = zfs.zfs_list(fs=fs, types='snapshot') or []
+        # get list of snapshots and properties sorted by creation time. First is allready taken snapshot.
+        srt_snapshots = _get_current_hanoi_state(fs, fs_snapshots)[1:]
+        # get control number - useful for debuging and checking hanoi rotation scheme
+        _hanoi_builder(fs, snp_tag, class_nr, srt_snapshots, recurse=True)
+
+
+def _hanoi_builder(fs, tag, class_nr, srt_snapshots, recurse=False):
+    """Help function, take care for hanoi status
+    
+    :raises: zfswrapper.ZfsException
+    """
+    class_list = _get_class_list(class_nr) #e.g. ['A', 'B', 'C', 'D', 'E']
+    modulov = 2**(class_nr-1) #useful to create control number
     next_control_nr = _get_next_control_number(srt_snapshots, modulov)
 
     for ptr in range(0, class_nr):
@@ -109,25 +160,32 @@ def backup_guard(fs, class_nr):
             # get all old snapshots same class
             old_snapshot = filter(lambda x: x[_backup_property]==class_label, srt_snapshots)
 
-            # create snapshot tag using time
-            timestamp = time.strftime('%Y%m%d%H%M%S')
-            tag = '%s-%s' % (_filtr_prefix, timestamp)
-
-            try:
-                print "to create: {'%s': '%s', '%s': '%s'}" % (_backup_property, class_label, _backup_control_nr, next_control_nr)
-                # make new snapshot - if not made then exception is throw from zfswrapper  
-                zfs.zfs_snapshot(fs, tag, properties={_backup_property:class_label, _backup_control_nr:next_control_nr})
-            except zfs.ZfsException as e:
-                print 'Create new snapshot fail (FYI: old snapshots not destroyed):', e
+            print "to create: {'%s': '%s', '%s': '%s'}" % (_backup_property, class_label, _backup_control_nr, next_control_nr)
+            if recurse:
+                snp_already_taken = '%s@%s' % (fs, tag)
+                # mark already taken snapshot with proper class and control_nr - if problem ZfsException is throw
+                zfs.zfs_set(snp_already_taken, _backup_control_nr, next_control_nr)
+                zfs.zfs_set(snp_already_taken, _backup_property, class_label)
             else:
-                # delete old snapshots if new snapshot was taken
-                for old in old_snapshot:
-                    print 'to destroy:', old
-                    zfs.zfs_destroy(old['name'])
+                # make new snapshot - if problem ZfsException is throw
+                zfs.zfs_snapshot(fs, tag, properties={_backup_property:class_label, _backup_control_nr:next_control_nr})
+            # delete old snapshots same class, only if new snapshot was taken - if probelm ZfsException is throw
+            for old in old_snapshot:
+                print 'to destroy:', old
+                zfs.zfs_destroy(old['name'])
             # job done
             break
 
+
 if __name__ == '__main__':
-    fs = 'galaxy01/fleet11'
     class_nr = 5
+    
+    print 'Guard zfs'
+    fs = 'galaxy01/fleet11'
     backup_guard(fs, class_nr)
+    
+    print '\nGuard zpool'
+    pool = 'galaxy03'
+    _filter_prefix = 'tower'
+    backup_guard_recurse(pool, class_nr)
+
