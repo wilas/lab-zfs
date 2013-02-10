@@ -57,7 +57,7 @@ def _get_current_hanoi_state(fs, snapshots_list):
 
     info_list = []
     for snapshot in filter_snapshots:
-        # get info about each snapshot - if problem ZfsException is throw
+        # get info about each snapshot, may return None or empty dict
         info = zfs.zfs_get(snapshot, property='name,creation,%s,%s' % (_backup_property, _backup_control_nr))
         info_list.append(info)
 
